@@ -25,23 +25,21 @@ class WrflGUI(tk.Tk):
         self.frame.grid(sticky="nwse")
 
         # Plots
-        self.figurepie = Figure(figsize=(3, 3), dpi=100)
-        self.figurepieeff = Figure(figsize=(3, 3), dpi=100)
-        self.figurebars = Figure(figsize=(3, 2), dpi=100)
+        self.figurepie = Figure(figsize=(3, 3), dpi=80)
+        self.figurepieeff = Figure(figsize=(3, 3), dpi=80)
+        self.figurebars = Figure(figsize=(5, 4), dpi=65)
 
-        self.plotpie = self.figurepie.add_subplot(1, 1, 1)
-        self.plotpieeff = self.figurepieeff.add_subplot(1, 1, 1)
-        self.plotbars = self.figurebars.add_subplot(1, 1, 1)
-
-        self.plotbars.bar([1, 2, 3], [3, 2, 1])
+        self.plotpie = self.figurepie.add_subplot(111)
+        self.plotpieeff = self.figurepieeff.add_subplot(111)
+        self.plotbars = self.figurebars.add_subplot(111)
 
         self.canvaspie = FigureCanvasTkAgg(self.figurepie, self)
         self.canvaspieeff = FigureCanvasTkAgg(self.figurepieeff, self)
         self.canvasbars = FigureCanvasTkAgg(self.figurebars, self)
 
-        self.canvaspie.get_tk_widget().grid(row=5, column=0, columnspan=5)
-        self.canvaspieeff.get_tk_widget().grid(row=5, column=5)
-        self.canvasbars.get_tk_widget().grid(row=0, column=5)
+        self.canvaspie.get_tk_widget().grid(row=0, column=5, rowspan=6)
+        self.canvaspieeff.get_tk_widget().grid(row=6, column=5, sticky='nw')
+        self.canvasbars.get_tk_widget().grid(row=6, column=0, columnspan=5, sticky='n')
 
         self.redraw()
 
@@ -149,13 +147,23 @@ class WrflGUI(tk.Tk):
     def redraw(self):
         self.plotpie.clear()
         self.plotpieeff.clear()
+        self.plotbars.clear()
+
         self.plotpie.set_title("Trefferwahrscheinlichkeiten", verticalalignment='top')
         self.plotpieeff.set_title("Trefferwahrscheinlichkeiten:\nEffektiv", verticalalignment='top')
+
+        self.plotbars.set_title("Ausscheidewahrscheinlichkeit nach Zug: Spieler")
+        self.plotbars.set_xlabel("Zug")
+        self.plotbars.set_ylabel("P in dezimal")
+
         self.plotpie.pie([self.battle.event_player, self.battle.event_stalemate, self.battle.event_enemy],
         colors=[ '#1f77b4', '#ff7f0e', '#2ca02c'], startangle=270, labels=['Gegner', 'Gleichstand', 'Spieler'],
         autopct='%1.1f%%', radius=0.9)
         self.plotpieeff.pie([self.battle.event_player, self.battle.event_enemy], colors=['#1f77b4', '#2ca02c'],
         startangle=270,  labels=['Gegner', 'Spieler'], autopct='%1.1f%%', radius=0.9)
+        listrange = list(range(self.battle.player_hp, self.battle.player_hp+5))
+        self.plotbars.bar(listrange, [self.battle.expected_fall_distribution(t) for t in listrange], width=1, color='#2ca02c', tick_label=listrange)
+
         self.canvaspie.show()
         self.canvaspieeff.show()
-
+        self.canvasbars.show()

@@ -8,13 +8,13 @@ def binomial_coefficient(n, k):
     """Returns the value for n choose k."""
     return math.factorial(n)/(math.factorial(k)*math.factorial(n-k))
 
-def binomial_probability(k, n, p):
+def binomial_probability(n, k, p):
     """Returns the value P for the probabillity mass function P(k;n,p) = (n k) p^k (1-p)^n-k ."""
     return binomial_coefficient(n, k)*(p**k)*((1-p)**(n-k))
 
-def binomial_distribution(k, n, p):
+def binomial_distribution(n, k, p):
     """Returns the value F for the cumulative distribution function F(k,n,p)."""
-    return sum([binomial_probability(i, n, p) for i in range(1, k+1)])
+    return sum([binomial_probability(n, i, p) for i in range(k+1)])
 
 class Battle:
     """The Battle class is a tool to track, monitor and calculate events involving
@@ -55,3 +55,7 @@ class Battle:
     def exportcsv(self):
         """Exports all values as String suitable to make a CSV file."""
         pass
+
+    def expected_fall_distribution(self, turn):
+        probability = self.event_player/(self.event_enemy+self.event_player)
+        return 1-binomial_distribution(turn, self.player_hp-1, probability)
