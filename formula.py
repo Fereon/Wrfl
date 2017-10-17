@@ -41,7 +41,7 @@ class Battle:
         """Calculates the number of all the possible win, lose and stalemate events."""
         pevent, eevent, sevent = 0, 0, 0
         for playerdice in range(self.min_player, self.max_player+1):
-            for enemydice in range(self.min_enemy, self.max_enemy+1-self.tank_mode):
+            for enemydice in range(self.min_enemy-self.tank_mode, self.max_enemy+1-self.tank_mode):
                 if playerdice > enemydice:
                     pevent = pevent+1
                 elif playerdice < enemydice:
@@ -51,3 +51,7 @@ class Battle:
         self.event_enemy = pevent
         self.event_player = eevent
         self.event_stalemate = sevent
+
+    def exportcsv(self):
+        """Exports all values as String suitable to make a CSV file."""
+        pass
