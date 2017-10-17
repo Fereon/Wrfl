@@ -48,14 +48,25 @@ class Battle:
                     eevent = eevent+1
                 else:
                     sevent = sevent+1
-        self.event_enemy = pevent
-        self.event_player = eevent
+        self.event_player = pevent
+        self.event_enemy = eevent
         self.event_stalemate = sevent
 
     def exportcsv(self):
         """Exports all values as String suitable to make a CSV file."""
-        pass
+        listrange = list(range(self.player_hp, self.player_hp+5))
+        listresults = [self.expected_fall_distribution(t) for t in listrange]
+        listtext = ";\n\nZüge;p Ausscheiden"
+        for atem, btem in zip(listrange, listresults):
+            listtext = listtext + ';\n' + str(atem) + ';' + str(btem)
+        export = ["Kleinster Spielerwurf;" + str(self.min_player) + ";;Spielerereignisse;" + str(self.event_player) + ";;p Spieler;=E1/(E1+E2+E3)",
+        ";\nGrößter Spielerwurf;" + str(self.max_player) + ";;Gegnerereignisse;" + str(self.event_enemy) + ";;p Gegner;=E2/(E1+E2+E3)",
+        ";\nSpielerleben;" + str(self.player_hp) + ";;Gleichstand;" + str(self.event_stalemate) + ";;p Gleichstand;=E3/(E1+E2+E3)",
+        ";\nKleinster Gegnerwurf;" + str(self.min_enemy) + ";;Total;=E1+E2+E3;;p SpielerEffektiv;=E1/(E1+E2)",
+        ";\nGrößter Gegnerwurf;" + str(self.max_enemy) + ";;;;;p GegnerEffektiv;=E1/(E1+E2)",
+        ";\nTank Modus;" + str(self.tank_mode), listtext + ';']
+        return ''.join(export).replace('.', ',')
 
     def expected_fall_distribution(self, turn):
-        probability = self.event_player/(self.event_enemy+self.event_player)
+        probability = self.event_enemy/(self.event_enemy+self.event_player)
         return 1-binomial_distribution(turn, self.player_hp-1, probability)

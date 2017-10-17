@@ -25,9 +25,9 @@ class WrflGUI(tk.Tk):
         self.frame.grid(sticky="nwse")
 
         # Plots
-        self.figurepie = Figure(figsize=(3, 3), dpi=80)
-        self.figurepieeff = Figure(figsize=(3, 3), dpi=80)
-        self.figurebars = Figure(figsize=(5, 4), dpi=65)
+        self.figurepie = Figure(figsize=(3, 3), dpi=85)
+        self.figurepieeff = Figure(figsize=(3, 3), dpi=85)
+        self.figurebars = Figure(figsize=(5, 4), dpi=64)
 
         self.plotpie = self.figurepie.add_subplot(111)
         self.plotpieeff = self.figurepieeff.add_subplot(111)
@@ -53,10 +53,18 @@ class WrflGUI(tk.Tk):
         """Manages the menu bar."""
         menubar = tk.Menu(self.frame)
         menu = tk.Menu(menubar, tearoff=0)
-        menu.add_command(label="Nach CSV exportieren", command=lambda: filedialog.asksaveasfile())
+        menu.add_command(label="Nach CSV exportieren", command=lambda: self.savexport())
         menu.add_command(label="Schließen", command=lambda: quit())
         menubar.add_cascade(label="Menü", menu=menu)
         tk.Tk.config(self, menu=menubar)
+
+    def savexport(self):
+        """Manages the saving of exports."""
+        export = filedialog.asksaveasfile(mode='w', title='Wrfl Export', defaultextension='.csv', filetypes=(("CVS Datei", "*.csv"),("Alle Datein", "*.*")))
+        data = self.battle.exportcsv()
+        export.write(data)
+        export.close()
+
 
     def managestaticlabels(self):
         """Manages static labels."""
@@ -141,8 +149,7 @@ class WrflGUI(tk.Tk):
         
         checkvar = tk.IntVar()
         checktank = ttk.Checkbutton(self.frame, variable=checkvar, command=lambda: checkcommand(checkvar))
-        checktank.grid(row=2, column=4, sticky='w')
-        
+        checktank.grid(row=2, column=4, sticky='w')        
 
     def redraw(self):
         self.plotpie.clear()
@@ -157,12 +164,15 @@ class WrflGUI(tk.Tk):
         self.plotbars.set_ylabel("P in dezimal")
 
         self.plotpie.pie([self.battle.event_player, self.battle.event_stalemate, self.battle.event_enemy],
-        colors=[ '#1f77b4', '#ff7f0e', '#2ca02c'], startangle=270, labels=['Gegner', 'Gleichstand', 'Spieler'],
+        colors=['#2ca02c','#ff7f0e', '#1f77b4'], startangle=90, labels=['Spieler', 'Gleichstand', 'Gegner'],
         autopct='%1.1f%%', radius=0.9)
-        self.plotpieeff.pie([self.battle.event_player, self.battle.event_enemy], colors=['#1f77b4', '#2ca02c'],
-        startangle=270,  labels=['Gegner', 'Spieler'], autopct='%1.1f%%', radius=0.9)
+        self.plotpieeff.pie([self.battle.event_player, self.battle.event_enemy], colors=['#2ca02c', '#1f77b4'],
+        startangle=90,  labels=['Spieler', 'Gegner'], autopct='%1.1f%%', radius=0.9)
         listrange = list(range(self.battle.player_hp, self.battle.player_hp+5))
-        self.plotbars.bar(listrange, [self.battle.expected_fall_distribution(t) for t in listrange], width=1, color='#2ca02c', tick_label=listrange)
+        listresults =[self.battle.expected_fall_distribution(t) for t in listrange]
+        self.plotbars.bar(listrange, listresults, width=1, color='#2ca02c', tick_label=listrange)
+        for a,b in zip(listrange, listresults):
+            self.plotbars.text(a, b, '{:.1%}'.format(b))
 
         self.canvaspie.show()
         self.canvaspieeff.show()
