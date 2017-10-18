@@ -1,5 +1,5 @@
 """This module contains all graphical user interface objects."""
-__version__ = "0.1"
+__version__ = "0.8"
 __author__ = "Fereon"
 
 import tkinter as tk
@@ -39,7 +39,7 @@ class WrflGUI(tk.Tk):
 
         self.canvaspie.get_tk_widget().grid(row=0, column=5, rowspan=6)
         self.canvaspieeff.get_tk_widget().grid(row=6, column=5, sticky='nw')
-        self.canvasbars.get_tk_widget().grid(row=6, column=0, columnspan=5, sticky='n')
+        self.canvasbars.get_tk_widget().grid(row=6, column=0, columnspan=5, sticky='ne')
 
         self.redraw()
 
@@ -60,11 +60,13 @@ class WrflGUI(tk.Tk):
 
     def savexport(self):
         """Manages the saving of exports."""
-        export = filedialog.asksaveasfile(mode='w', title='Wrfl Export', defaultextension='.csv', filetypes=(("CVS Datei", "*.csv"),("Alle Datein", "*.*")))
-        data = self.battle.exportcsv()
-        export.write(data)
-        export.close()
-
+        try: 
+            export = filedialog.asksaveasfile(mode='w', title='Wrfl Export', defaultextension='.csv', filetypes=(("CVS Datei", "*.csv"),("Alle Datein", "*.*")))
+            data = self.battle.exportcsv()
+            export.write(data)
+            export.close()
+        except (AttributeError):
+            pass
 
     def managestaticlabels(self):
         """Manages static labels."""
