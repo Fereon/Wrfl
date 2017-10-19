@@ -54,7 +54,7 @@ class WrflGUI(tk.Tk):
         menubar = tk.Menu(self.frame)
         menu = tk.Menu(menubar, tearoff=0)
         menu.add_command(label="Nach CSV exportieren", command=lambda: self.savexport())
-        menu.add_command(label="Schließen", command=lambda: quit())
+        menu.add_command(label="Schließen", command=lambda: exit())
         menubar.add_cascade(label="Menü", menu=menu)
         tk.Tk.config(self, menu=menubar)
 
